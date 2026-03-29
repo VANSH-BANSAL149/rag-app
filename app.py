@@ -3,11 +3,11 @@ from rag_pipeline import index_pdf, query_pdf
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
-
+os.environ["TRANSFORMERS_NO_TORCHVISION"] = "1"
 # 🔥 Load env
 load_dotenv()
 
-api_key = os.getenv("GEMINI_API_KEY")
+api_key = st.secrets["GEMINI_API_KEY"]
 print("KEY LOADED:", api_key)
 
 # 🚨 Safety check
