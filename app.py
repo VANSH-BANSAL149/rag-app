@@ -3,6 +3,8 @@ from rag_pipeline import index_pdf, query_pdf
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
+if "vector_store" not in st.session_state:
+    st.session_state.vector_store = None
 os.environ["TRANSFORMERS_NO_TORCHVISION"] = "1"
 # 🔥 Load env
 load_dotenv()
@@ -30,16 +32,16 @@ if uploaded_file:
     with open("temp.pdf", "wb") as f:
         f.write(uploaded_file.read())
 
-    index_pdf("temp.pdf")
+    st.session_state.vector_store = index_pdf("temp.pdf")
     st.success("PDF indexed!")
 
 query = st.text_input("Ask something")
 
-if query:
-    context = query_pdf(query)
+if query and st.session_state.vector_store:
+    context = query_pdf(query, st.session_state.vector_store)
 
     response = client.chat.completions.create(
-        model="gemini-2.5-flash",  # ✅ FIXED MODEL
+        model="gemini-2.5-flash",
         messages=[
             {"role": "system", "content": "Answer ONLY from context"},
             {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {query}"}

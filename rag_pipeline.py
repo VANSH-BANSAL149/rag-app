@@ -6,12 +6,9 @@ embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
 
-vector_store = None
 
 
 def index_pdf(file_path):
-    global vector_store
-
     loader = PyPDFLoader(file_path)
     docs = loader.load()
 
@@ -22,9 +19,9 @@ def index_pdf(file_path):
 
     chunks = splitter.split_documents(docs)
 
-    vector_store = FAISS.from_documents(chunks, embeddings)
+    return FAISS.from_documents(chunks, embeddings)
 
 
-def query_pdf(query):
+def query_pdf(query, vector_store):
     docs = vector_store.similarity_search(query, k=5)
     return "\n\n".join([doc.page_content for doc in docs])
